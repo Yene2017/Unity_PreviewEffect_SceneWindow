@@ -1,0 +1,11 @@
+
+*.meta
+.vs/*
+Library/*
+Logs/*
+obj/*
+Packages/*
+ProjectSettings/*
+Temp/*
+*.sln
+*.csproj
