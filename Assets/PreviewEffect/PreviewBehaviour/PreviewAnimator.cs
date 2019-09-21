@@ -9,27 +9,29 @@ namespace Tools.PreviewEffect
 {
     [ExecuteInEditMode]
     [MarkPreview(typeof(Animator))]
-    public class PreviewAnimator : PreviewBehaviour<Animator>
+    public class PreviewAnimator : PreviewBehaviour
     {
+        public Animator target;
         public AnimationClip clip;
 
         protected override void UpdatePreview()
         {
-            if (isPlaying)
+            if (clip)
             {
-                current = EditorApplication.timeSinceStartup - startTime;
-                if (clip)
-                {
-                    clip.SampleAnimation(gameObject, (float)current);
-                }
+                var current = this.current - startTime;
+                clip.SampleAnimation(gameObject, (float)current);
             }
         }
 
         protected override void OnPlay()
         {
-            if (behaviour)
+            if (!target)
             {
-                clip = behaviour.GetCurrentAnimatorClipInfo(0)[0].clip;
+                target = GetComponent<Animator>();
+            }
+            if (target)
+            {
+                clip = target.GetCurrentAnimatorClipInfo(0)[0].clip;
             }
             if (clip)
             {
@@ -48,6 +50,11 @@ namespace Tools.PreviewEffect
                 clip.SampleAnimation(gameObject, clip.length);
             }
             clip = null;
+        }
+
+        public override bool EnablePreview()
+        {
+            return target && target.enabled;
         }
 
     }

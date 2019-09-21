@@ -116,7 +116,7 @@ namespace Tools.PreviewEffect
                 this.keyframeCount = (int)clips.SelectMany(c =>
                 {
                     return AnimationUtility.GetAllCurves(c);
-                }).Average(c =>
+                }).Distinct().Average(c =>
                 {
                     return c.curve.keys.Length;
                 });

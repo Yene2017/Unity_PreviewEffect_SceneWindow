@@ -10,10 +10,9 @@ namespace Tools.PreviewEffect
 {
     public class PreviewEffectHandle
     {
-        public GameObject selectEffect;
-        Dictionary<Type, Type> markPreviewMap = new Dictionary<Type, Type>();
+        static Dictionary<Type, Type> markPreviewMap = new Dictionary<Type, Type>();
 
-        public PreviewEffectHandle()
+        static PreviewEffectHandle()
         {
             foreach (var ab in AppDomain.CurrentDomain.GetAssemblies())
             {
@@ -25,6 +24,11 @@ namespace Tools.PreviewEffect
                 }
             }
         }
+
+        public GameObject selectEffect;
+        public bool isPlaying;
+        public bool isPaused;
+        public double stepInterval = 0.1f;
 
         public void ChangeHandleEffect(GameObject newEf)
         {
@@ -56,6 +60,8 @@ namespace Tools.PreviewEffect
             {
                 return;
             }
+            isPlaying = true;
+            isPaused = false;
             var ef = selectEffect;
             var ps = ef.GetComponentsInChildren<PreviewBehaviour>();
             foreach (var p in ps)
@@ -70,6 +76,8 @@ namespace Tools.PreviewEffect
             {
                 return;
             }
+            isPlaying = false;
+            isPaused = true;
             var ef = selectEffect;
             var ps = ef.GetComponentsInChildren<PreviewBehaviour>();
             foreach (var p in ps)
@@ -84,6 +92,8 @@ namespace Tools.PreviewEffect
             {
                 return;
             }
+            isPlaying = false;
+            isPaused = false;
             var ef = selectEffect;
             var ps = ef.GetComponentsInChildren<PreviewBehaviour>();
             foreach (var p in ps)
@@ -109,6 +119,36 @@ namespace Tools.PreviewEffect
         public static implicit operator bool(PreviewEffectHandle handle)
         {
             return handle != null;
+        }
+
+        public void Step()
+        {
+            if (!selectEffect)
+            {
+                return;
+            }
+            var ef = selectEffect;
+            var ps = ef.GetComponentsInChildren<PreviewBehaviour>();
+            foreach (var p in ps)
+            {
+                p.Step(stepInterval);
+            }
+        }
+
+        public void Strides()
+        {
+            if (!selectEffect)
+            {
+                return;
+            }
+            var ef = selectEffect;
+            var ps = ef.GetComponentsInChildren<PreviewBehaviour>();
+            foreach (var p in ps)
+            {
+                p.Step(stepInterval);
+                p.Step(stepInterval);
+                p.Step(stepInterval);
+            }
         }
     }
 

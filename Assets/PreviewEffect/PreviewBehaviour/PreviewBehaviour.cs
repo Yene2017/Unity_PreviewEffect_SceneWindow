@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System;
+using UnityEditor;
 using UnityEngine;
 
 
@@ -7,10 +8,19 @@ namespace Tools.PreviewEffect
 
     public class PreviewBehaviour : MonoBehaviour
     {
-        protected double startTime;
-        protected double current;
+        public double startTime;
+        public double current;
         public double lastTime;
-        protected bool isPlaying;
+        public double deltaTime;
+        public bool isPlaying;
+        public bool isPaused;
+        public bool isStoped
+        {
+            get
+            {
+                return !isPaused && !isPlaying;
+            }
+        }
 
         private void OnEnable()
         {
@@ -24,29 +34,61 @@ namespace Tools.PreviewEffect
 
         private void Update()
         {
-            current = EditorApplication.timeSinceStartup;
-            UpdatePreview();
-            lastTime = current;
+            Sample();
         }
 
         public void Play()
         {
             hideFlags = HideFlags.HideAndDontSave | HideFlags.HideInInspector;
             startTime = EditorApplication.timeSinceStartup;
+            lastTime = EditorApplication.timeSinceStartup;
             isPlaying = true;
+            isPaused = false;
             OnPlay();
         }
 
         public void Pause()
         {
             isPlaying = false;
+            isPaused = true;
             OnPause();
         }
 
         public void Stop()
         {
             isPlaying = false;
+            isPaused = false;
             OnStop();
+        }
+
+        public void Step(double interval)
+        {
+            if (EnablePreview())
+            {
+                var time = EditorApplication.timeSinceStartup;
+                startTime += time - current - interval;
+                current = time;
+                deltaTime = interval;
+                lastTime = current - interval;
+                UpdatePreview();
+                lastTime = time;
+            }
+        }
+
+        private void Sample()
+        {
+            var time = EditorApplication.timeSinceStartup;
+            if (isPlaying && EnablePreview())
+            {
+                current = time;
+                deltaTime = time - lastTime;
+                UpdatePreview();
+                lastTime = time;
+            }
+            else
+            {
+                startTime = time;
+            }
         }
 
         protected virtual void OnPlay()
@@ -68,37 +110,10 @@ namespace Tools.PreviewEffect
         {
         }
 
-    }
-
-    public class PreviewBehaviour<T> : PreviewBehaviour where T : Behaviour
-    {
-        protected T behaviour;
-
-        private void Update()
+        public virtual bool EnablePreview()
         {
-            if (!behaviour || behaviour.enabled)
-            {
-                current = EditorApplication.timeSinceStartup;
-                UpdatePreview();
-                lastTime = current;
-            }
-            else
-            {
-                startTime = EditorApplication.timeSinceStartup;
-            }
+            return true;
         }
 
-        public new void Play()
-        {
-            hideFlags = HideFlags.HideAndDontSave | HideFlags.HideInInspector;
-            if (!behaviour)
-            {
-                behaviour = GetComponent<T>();
-            }
-            startTime = EditorApplication.timeSinceStartup;
-            isPlaying = true;
-            OnPlay();
-        }
     }
-
 }

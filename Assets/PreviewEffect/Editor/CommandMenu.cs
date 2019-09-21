@@ -96,21 +96,38 @@ namespace Tools.PreviewEffect
         {
             using (new GUILayout.HorizontalScope())
             {
-                if (GUILayout.Button("Restart"))
+                if (handle.isPlaying)
                 {
-                    if (!efInfo.lockEffect || !handle.selectEffect)
+                    if (GUILayout.Button("Pause"))
                     {
-                        var select = Selection.activeGameObject;
-                        handle.ChangeHandleEffect(select);
-
-                        efInfo.effect = select;
-                        efInfo.Collect();
+                        handle.Pause();
                     }
-                    handle.Play();
                 }
-                if (GUILayout.Button("Pause"))
+                else
                 {
-                    handle.Pause();
+                    if (GUILayout.Button("Play"))
+                    {
+                        if (!efInfo.lockEffect || !handle.selectEffect)
+                        {
+                            var select = Selection.activeGameObject;
+                            handle.ChangeHandleEffect(select);
+
+                            efInfo.effect = select;
+                            efInfo.Collect();
+                        }
+                        handle.Play();
+                    }
+                    if (handle.isPaused)
+                    {
+                        if (GUILayout.Button(">", GUILayout.Width(20)))
+                        {
+                            handle.Step();
+                        }
+                        if (GUILayout.Button(">>", GUILayout.Width(40)))
+                        {
+                            handle.Strides();
+                        }
+                    }
                 }
                 if (GUILayout.Button("Stop"))
                 {

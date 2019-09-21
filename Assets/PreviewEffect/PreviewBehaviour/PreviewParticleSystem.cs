@@ -15,21 +15,12 @@ namespace Tools.PreviewEffect
         {
             if (ps)
             {
-                if (isPlaying)
-                {
-                    var delta = current - lastTime;
-                    ps.Simulate((float)delta, false, false);
-                }
-                else
-                {
-                    ps.Pause();
-                }
+                ps.Simulate((float)deltaTime, false, false);
             }
         }
 
         protected override void OnPlay()
         {
-            lastTime = EditorApplication.timeSinceStartup;
             if (!ps)
             {
                 ps = GetComponent<ParticleSystem>();
@@ -43,12 +34,17 @@ namespace Tools.PreviewEffect
 
         protected override void OnPause()
         {
-            ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+            ps.Pause(false);
         }
 
         protected override void OnStop()
         {
             ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        }
+
+        public override bool EnablePreview()
+        {
+            return true;
         }
     }
 
